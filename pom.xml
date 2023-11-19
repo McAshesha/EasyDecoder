@@ -7,11 +7,38 @@
     <groupId>ru.ashesha</groupId>
     <artifactId>EasyDecoder</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>EasyDecoder</name>
+    <packaging>jar</packaging>
+
+    <licenses>
+        <license>
+            <name>GNU AFFERO GENERAL PUBLIC LICENSE VERSION 3</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.html</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>mcashesha</id>
+            <name>Ashesha</name>
+            <email>mcashesha@mail.ru</email>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <exec.mainClass>ru.ashesha.easydecoder.Main</exec.mainClass>
     </properties>
-    
+
+    <dependencies>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20230227</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
 </project>
