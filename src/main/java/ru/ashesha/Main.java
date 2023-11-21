@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import static java.lang.System.exit;
 
 public class Main {
+
         public static void main(String[] args) {
             boolean encode = false;
             String input = "input.json", output = "output.json";
