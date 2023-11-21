@@ -5,9 +5,40 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class Main {
-    public static void main(String[] args) {
+import static java.lang.System.exit;
 
+public class Main {
+
+    public static void main(String[] args) {
+        boolean encode = false;
+        String input = "input.json", output = "output.json";
+
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("-encode"))
+                encode = true;
+
+            else if (arg.equalsIgnoreCase("-decode"))
+                encode = false;
+
+            else if (arg.startsWith("-in=")) {
+                checkFormatInputOutput(arg);
+                input = arg.substring(4);
+
+            } else if (arg.startsWith("-out=")) {
+                checkFormatInputOutput(arg);
+                output = arg.substring(5);
+            }
+
+        }
+
+
+    }
+
+    static void checkFormatInputOutput(String data) {
+        if (data.endsWith(".json") || data.endsWith(".txt"))
+            return;
+        System.out.println("Only .txt and .json file formats are supported.");
+        exit(-1);
     }
 
 
