@@ -31,15 +31,11 @@ public class Main {
                     exit(-1);
                 }
 
-            } else if (arg.startsWith("-in=")) {
-                checkFormatInputOutput(arg);
-                input = arg.substring(4);
+            } else if (arg.startsWith("-in="))
+                input = arg.substring(4) + ".json";
 
-            } else if (arg.startsWith("-out=")) {
-                checkFormatInputOutput(arg);
-                output = arg.substring(5);
-            }
-
+            else if (arg.startsWith("-out="))
+                output = arg.substring(5) + ".json";
         }
 
 
@@ -58,14 +54,6 @@ public class Main {
 
     }
 
-    static void checkFormatInputOutput(String data) {
-        if (data.endsWith(".json") || data.endsWith(".txt"))
-            return;
-        System.out.println("Only .txt and .json file formats are supported.");
-        exit(-1);
-    }
-
-
     static String readFile(String name) {
         createFile(name);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(name)), StandardCharsets.UTF_8))) {
@@ -78,14 +66,14 @@ public class Main {
 
     static void write(String name, String text) {
         createFile(name);
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(name))))) {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(name)), StandardCharsets.UTF_8))) {
             writer.write(toUTF8(text));
             writer.flush();
         } catch (Throwable ignored) {
         }
     }
 
-    static String toUTF8(String line) {
+    public static String toUTF8(String line) {
         int index = 0;
         char[] chars = line.toCharArray();
 
