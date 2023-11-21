@@ -11,48 +11,48 @@ import static java.lang.System.exit;
 
 public class Main {
 
-    public static void main(String[] args) {
-        boolean encode = false;
-        String input = "input.json", output = "output.json";
-        Decoder decoder = Decoder.getInstance();
+        public static void main(String[] args) {
+            boolean encode = false;
+            String input = "input.json", output = "output.json";
+            Decoder decoder = Decoder.getInstance();
 
-        for (String arg : args) {
-            if (arg.equalsIgnoreCase("-encode"))
-                encode = true;
+            for (String arg : args) {
+                if (arg.equalsIgnoreCase("-encode"))
+                    encode = true;
 
-            else if (arg.equalsIgnoreCase("-decode"))
-                encode = false;
+                else if (arg.equalsIgnoreCase("-decode"))
+                    encode = false;
 
-            else if (arg.startsWith("-lfm=")) {
-                try {
-                    decoder.readLfm(Integer.parseInt(arg.substring(5)));
-                } catch (Throwable e) {
-                    System.out.println("Invalid lfm format.");
-                    exit(-1);
-                }
+                else if (arg.startsWith("-lfm=")) {
+                    try {
+                        decoder.readLfm(Integer.parseInt(arg.substring(5)));
+                    } catch (Throwable e) {
+                        System.out.println("Invalid lfm format.");
+                        exit(-1);
+                    }
 
-            } else if (arg.startsWith("-in="))
-                input = arg.substring(4) + ".json";
+                } else if (arg.startsWith("-in="))
+                    input = arg.substring(4) + ".json";
 
-            else if (arg.startsWith("-out="))
-                output = arg.substring(5) + ".json";
+                else if (arg.startsWith("-out="))
+                    output = arg.substring(5) + ".json";
+            }
+
+
+            try {
+                JSONArray array = new JSONArray(readFile(input));
+                if (encode)
+                    decoder.encodeArray(array);
+                else decoder.decodeArray(array);
+
+                write(output, array.toString());
+                System.out.println("Read the packet from " + input + " and display the result in " + output + ".");
+            } catch (Throwable e) {
+                System.out.println("Invalid packet format in " + input + ".");
+                exit(-1);
+            }
+
         }
-
-
-        try {
-            JSONArray array = new JSONArray(readFile(input));
-            if (encode)
-                decoder.encodeArray(array);
-            else decoder.decodeArray(array);
-
-            write(output, array.toString());
-            System.out.println("Read the packet from " + input + " and display the result in " + output + ".");
-        } catch (Throwable e) {
-            System.out.println("Invalid packet format in " + input + ".");
-            exit(-1);
-        }
-
-    }
 
     static String readFile(String name) {
         createFile(name);
