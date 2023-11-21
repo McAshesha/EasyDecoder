@@ -27,6 +27,18 @@ public class Decoder {
         this.lfm = lfm;
     }
 
+    public void decode(JSONArray array) {
+        Object o = decodePacket(array.get(1), 0, lfm);
+        array.remove(1);
+        array.put(1, o);
+    }
+
+    public void encode(JSONArray array) {
+        Object o = encodePacket(array.get(1), lfm);
+        array.remove(1);
+        array.put(1, o);
+    }
+
 
 
     private Object decodePacket(Object var0, int var1, int lfm) {

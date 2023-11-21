@@ -1,5 +1,7 @@
 package ru.ashesha;
 
+import org.json.JSONArray;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,6 +14,7 @@ public class Main {
     public static void main(String[] args) {
         boolean encode = false;
         String input = "input.json", output = "output.json";
+        Decoder decoder = Decoder.getInstance();
 
         for (String arg : args) {
             if (arg.equalsIgnoreCase("-encode"))
@@ -20,7 +23,15 @@ public class Main {
             else if (arg.equalsIgnoreCase("-decode"))
                 encode = false;
 
-            else if (arg.startsWith("-in=")) {
+            else if (arg.startsWith("-lfm=")) {
+                try {
+                    decoder.readLfm(Integer.parseInt(arg.substring(5)));
+                } catch (Throwable e) {
+                    System.out.println("Invalid lfm format.");
+                    exit(-1);
+                }
+
+            } else if (arg.startsWith("-in=")) {
                 checkFormatInputOutput(arg);
                 input = arg.substring(4);
 
@@ -30,6 +41,8 @@ public class Main {
             }
 
         }
+
+
 
 
     }
