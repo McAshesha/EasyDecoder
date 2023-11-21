@@ -8,8 +8,6 @@ import java.nio.file.Paths;
 public class Main {
     public static void main(String[] args) {
 
-
-
     }
 
 
@@ -20,9 +18,9 @@ public class Main {
         } catch (Throwable ignored) {
         }
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(name)), StandardCharsets.UTF_8))) {
-            return reader.readLine();
+            String result = reader.readLine();
+            return result == null ? "" : result;
         } catch (Throwable e) {
-
             return "";
         }
     }
