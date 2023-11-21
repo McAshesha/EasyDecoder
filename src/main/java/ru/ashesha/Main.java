@@ -46,8 +46,9 @@ public class Main {
         try {
             JSONArray array = new JSONArray(readFile(input));
             if (encode)
-                decoder.encode(array);
-            else decoder.decode(array);
+                decoder.encodeArray(array);
+            else decoder.decodeArray(array);
+
             write(output, array.toString());
             System.out.println("Read the packet from " + input + " and display the result in " + output + ".");
         } catch (Throwable e) {

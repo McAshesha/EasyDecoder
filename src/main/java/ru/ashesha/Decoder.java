@@ -4,7 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 public class Decoder {
@@ -19,6 +19,7 @@ public class Decoder {
 
 
     private int lfm = 0;
+    private final Random random = new Random();
 
     private Decoder() {
     }
@@ -27,210 +28,173 @@ public class Decoder {
         this.lfm = lfm;
     }
 
-    public void decode(JSONArray array) {
-        Object o = decodePacket(array.get(1), 0, lfm);
+    public void decodeArray(JSONArray array) {
+        Object o = decodePacket(array.get(1), 0);
         array.remove(1);
         array.put(1, o);
     }
 
-    public void encode(JSONArray array) {
-        Object o = encodePacket(array.get(1), lfm);
+    public void encodeArray(JSONArray array) {
+        Object o = encodePacket(array.get(1));
         array.remove(1);
         array.put(1, o);
     }
 
-
-
-    private Object decodePacket(Object var0, int var1, int lfm) {
+    private Object decodePacket(Object input, int var1) {
         try {
-            if (var0 != null) {
-                if (var0.getClass().equals(JSONArray.class)) {
-                    for(int var9 = 0; var9 < ((JSONArray)var0).length(); ++var9) {
-                        if (!((JSONArray)var0).get(var9).getClass().equals(JSONObject.class) && !((JSONArray)var0).get(var9).getClass().equals(JSONArray.class)) {
-                            ((JSONArray)var0).put(var9, decode(((JSONArray)var0).get(var9), var1));
-                        } else {
-                            decodePacket(((JSONArray)var0).get(var9), var1, lfm);
-                        }
-                    }
+            if (input == null)
+                return null;
 
-                    if (((JSONArray)var0).length() >= 5) {
-                        Object var10 = ((JSONArray)var0).get(0);
-                        Object var11 = ((JSONArray)var0).get(1);
-                        ((JSONArray)var0).put(0, ((JSONArray)var0).get(((JSONArray)var0).length() - 1));
-                        ((JSONArray)var0).put(((JSONArray)var0).length() - 1, var10);
-                        ((JSONArray)var0).put(1, ((JSONArray)var0).get(3));
-                        ((JSONArray)var0).put(3, var11);
-                    }
+            if (input instanceof JSONArray) {
+                JSONArray jsonArray = (JSONArray) input;
 
-                    return var0;
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    Object element = jsonArray.get(i);
+                    if (element instanceof JSONObject || element instanceof JSONArray)
+                        jsonArray.put(i, decodePacket(element, var1));
+
+                    else jsonArray.put(i, decode(element, var1));
+
                 }
 
-                JSONObject var2 = (JSONObject)var0;
-                if (var1 == 0) {
-                    if (((JSONObject)var0).has("lfm1")) {
-                        var1 = lfm;
-                    } else {
-                        var1 = ((JSONObject)var0).getInt("lfm5");
+                swapArrayElements(jsonArray);
+                return jsonArray;
+            }
+
+            if (input instanceof JSONObject) {
+                JSONObject jsonObject = (JSONObject) input;
+
+                if (var1 == 0)
+                    var1 = jsonObject.has("lfm1") ? lfm : jsonObject.getInt("lfm5");
+
+                List<String> keys = new ArrayList<>(jsonObject.keySet());
+
+                for (String key : keys) {
+                    Object value = jsonObject.get(key);
+
+                    if ((value instanceof JSONObject || value instanceof JSONArray) &&
+                            ((!((JSONArray) value).isEmpty() && ((JSONArray) value).get(0) instanceof JSONObject) ||
+                                    (!((JSONArray) value).isEmpty() && ((JSONArray) value).get(0) instanceof JSONArray)))
+                        jsonObject.put((String) decode(key, var1), decodePacket(value, var1));
+
+                    else if (!isLFMKey(key)) {
+                        String decodedKey = (String) decode(key, var1);
+                        if (decodedKey.equals("logo"))
+                            jsonObject.put(decodedKey, value);
+
+                        else jsonObject.put(decodedKey, decode(value, var1));
                     }
-                }
 
-                ArrayList<String> var3 = new ArrayList<>();
-                Iterator<String> var4 = var2.keys();
-
-                while(var4.hasNext()) {
-                    String var5 = var4.next();
-                    var3.add(var5);
-                }
-
-                for (String var6 : var3) {
-                    if (var2.get(var6).getClass().equals(JSONObject.class) || var2.get(var6).getClass().equals(JSONArray.class) && !var2.getJSONArray(var6).isEmpty() && var2.getJSONArray(var6).get(0).getClass().equals(JSONObject.class) || var2.get(var6).getClass().equals(JSONArray.class) && !var2.getJSONArray(var6).isEmpty() && var2.getJSONArray(var6).get(0).getClass().equals(JSONArray.class)) {
-                        var2.put((String) decode(var6, var1), decodePacket(var2.get(var6), var1, lfm));
-                    } else if (!var6.equals("lfm1") && !var6.equals("lfm2") && !var6.equals("lfm3") && !var6.equals("lfm4") && !var6.equals("lfm5")) {
-                        String var7 = (String) decode(var6, var1);
-                        if (var7.equals("logo")) {
-                            var2.put(var7, var2.get(var6));
-                        } else {
-                            var2.put(var7, decode(var2.get(var6), var1));
-                        }
-                    }
-
-                    var2.remove(var6);
+                    jsonObject.remove(key);
                 }
             }
 
-            return var0;
-        } catch (ArrayIndexOutOfBoundsException var8) {
-            return var0;
+            return input;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return input;
         }
     }
 
-    private Object decode(Object var0, int var1) {
-        int var3;
-        if (!(var0 instanceof JSONArray)) {
-            if (var0 instanceof Boolean) {
-                return var0;
-            } else {
-                if (!(var0 instanceof String)) {
-                    var0 = var0.toString();
-                }
+    private void swapArrayElements(JSONArray jsonArray) {
+        if (jsonArray.length() < 5)
+            return;
 
-                char[] var6 = ((String)var0).toCharArray();
+        Object firstElement = jsonArray.get(0);
+        Object secondElement = jsonArray.get(1);
+        jsonArray.put(0, jsonArray.get(jsonArray.length() - 1));
+        jsonArray.put(jsonArray.length() - 1, firstElement);
+        jsonArray.put(1, jsonArray.get(3));
+        jsonArray.put(3, secondElement);
+    }
 
-                for(var3 = 0; var3 < var6.length; ++var3) {
-                    if (var3 == var6.length - 1 && var6[var3] == ' ') {
-                        try {
+    private Object decode(Object input, int var1) {
+        if (input instanceof JSONArray) {
+            JSONArray jsonArray = new JSONArray();
 
-                            return Integer.valueOf((new String(var6)).substring(0, var3));
+            for (int i = 0; i < ((JSONArray) input).length(); ++i)
+                jsonArray.put(decode(((JSONArray) input).get(i), var1));
 
-                        } catch (Exception e) {
+            swapArrayElements(jsonArray);
+            return jsonArray;
+        }
 
-                            try {
+        if (input instanceof Boolean)
+            return input;
 
-                                return Double.valueOf((new String(var6)).substring(0, var3));
+        String stringValue = input instanceof String ? (String) input : input.toString();
+        char[] charArray = stringValue.toCharArray();
 
-                            } catch (Exception ee) {
-
-                                return ((new String(var6)).substring(0, var3));
-
-                            }
-
-                        }
+        for (int i = 0; i < charArray.length; ++i) {
+            if (i == charArray.length - 1 && charArray[i] == ' ') {
+                try {
+                    return Integer.valueOf(new String(charArray, 0, i));
+                } catch (Exception e) {
+                    try {
+                        return Double.valueOf(new String(charArray, 0, i));
+                    } catch (Exception ee) {
+                        return new String(charArray, 0, i);
                     }
-
-                    var6[var3] = (char)(var6[var3] - var1);
                 }
-
-                return new String(var6);
             }
+            charArray[i] = (char) (charArray[i] - var1);
+        }
+
+        return new String(charArray);
+    }
+
+    private Object encodePacket(Object input) {
+        if (!(input instanceof JSONObject))
+            return input;
+
+        JSONObject jsonObject = (JSONObject) input;
+
+        if (lfm == 0)
+            lfm = 100 + random.nextInt(101);
+
+        List<String> keys = new ArrayList<>(jsonObject.keySet());
+
+        for (String key : keys) {
+            Object value = jsonObject.get(key);
+            if (value instanceof JSONObject)
+                jsonObject.put((String) encode(key, lfm), encodePacket(value));
+            else jsonObject.put((String) encode(key, lfm), encode(value, lfm));
+
+            jsonObject.remove(key);
+        }
+
+        jsonObject.put("lfm5", lfm);
+        return jsonObject;
+    }
+
+    private Object encode(Object input, int var2) {
+        if (!(input instanceof String) && !(input instanceof Number)) {
+            if (!(input instanceof JSONArray))
+                return input;
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < ((JSONArray) input).length(); ++i)
+                jsonArray.put(encode(((JSONArray) input).get(i), var2));
+
+            swapArrayElements(jsonArray);
+            return jsonArray;
+
         } else {
-            JSONArray var2 = new JSONArray();
-
-            for(var3 = 0; var3 < ((JSONArray)var0).length(); ++var3) {
-                var2.put(decode(((JSONArray)var0).get(var3), var1));
+            boolean isNumber = false;
+            if (input instanceof Number) {
+                input = input.toString();
+                isNumber = true;
             }
 
-            if (var2.length() >= 5) {
-                Object var7 = var2.get(0);
-                Object var4 = var2.get(1);
-                var2.put(0, var2.get(var2.length() - 1));
-                var2.put(var2.length() - 1, var7);
-                var2.put(1, var2.get(3));
-                var2.put(3, var4);
-            }
+            String stringValue = (String) input;
+            char[] charArray = stringValue.toCharArray();
+            for (int i = 0; i < charArray.length; ++i)
+                charArray[i] = (char) (charArray[i] + var2);
 
-            return var2;
+            return isNumber ? new String(charArray) + " " : new String(charArray);
         }
     }
 
-    private Object encodePacket(Object var1, int lfm) {
-        if (!var1.getClass().equals(JSONObject.class)) {
-            return var1;
-        } else {
-            JSONObject var3 = ((JSONObject)var1);
-            if (lfm == 0) {
-                lfm = 100 + new Random().nextInt(101);
-            }
-
-            ArrayList<String> var4 = new ArrayList<>();
-            Iterator<String> var5 = var3.keys();
-
-            while(var5.hasNext()) {
-                String var6 = var5.next();
-                var4.add(var6);
-            }
-
-            for (String var7 : var4) {
-                if (var3.get(var7) instanceof JSONObject) {
-                    var3.put((String) encode(var7, lfm), encodePacket(var3.get(var7), lfm));
-                } else {
-                    var3.put((String) encode(var7, lfm), encode(var3.get(var7), lfm));
-                }
-
-                var3.remove(var7);
-            }
-
-            var3.put("lfm5", lfm);
-            return var3;
-        }
-    }
-
-    private Object encode(Object var1, int var2) {
-        if (!(var1 instanceof String) && !(var1 instanceof Number)) {
-            if (!(var1 instanceof JSONArray)) {
-                return var1;
-            } else {
-                JSONArray var6 = new JSONArray();
-
-                for(int var7 = 0; var7 < ((JSONArray)var1).length(); ++var7) {
-                    var6.put(encode(((JSONArray)var1).get(var7), var2));
-                }
-
-                if (var6.length() >= 5) {
-                    Object var8 = var6.get(0);
-                    Object var9 = var6.get(1);
-                    var6.put(0, var6.get(var6.length() - 1));
-                    var6.put(var6.length() - 1, var8);
-                    var6.put(1, var6.get(3));
-                    var6.put(3, var9);
-                }
-
-                return var6;
-            }
-        } else {
-            boolean var3 = false;
-            if (var1 instanceof Number) {
-                var1 = var1.toString();
-                var3 = true;
-            }
-
-            char[] var4 = ((String)var1).toCharArray();
-
-            for(int var5 = 0; var5 < var4.length; ++var5) {
-                var4[var5] = (char)(var4[var5] + var2);
-            }
-
-            return var3 ? new String(var4) + " " : new String(var4);
-        }
+    private boolean isLFMKey(String key) {
+        return key.startsWith("lfm");
     }
 
 }
