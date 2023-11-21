@@ -12,11 +12,7 @@ public class Main {
 
 
     static String readFile(String name) {
-        try {
-            //noinspection ResultOfMethodCallIgnored
-            new File(name).createNewFile();
-        } catch (Throwable ignored) {
-        }
+        createFile(name);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(name)), StandardCharsets.UTF_8))) {
             String result = reader.readLine();
             return result == null ? "" : result;
@@ -24,4 +20,22 @@ public class Main {
             return "";
         }
     }
+
+    static void write(String name, String text) {
+        createFile(name);
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(name))))) {
+            writer.write(text);
+            writer.flush();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    static void createFile(String name) {
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            new File(name).createNewFile();
+        } catch (Throwable ignored) {
+        }
+    }
+
 }

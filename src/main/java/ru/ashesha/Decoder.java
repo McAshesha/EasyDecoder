@@ -27,6 +27,8 @@ public class Decoder {
         this.lfm = lfm;
     }
 
+
+
     private Object decodePacket(Object var0, int var1, int lfm) {
         try {
             if (var0 != null) {
@@ -218,29 +220,5 @@ public class Decoder {
             return var3 ? new String(var4) + " " : new String(var4);
         }
     }
-
-
-    private String toUTF8(String line) {
-        int index = 0;
-        char[] chars = line.toCharArray();
-
-        StringBuilder builder = new StringBuilder();
-        while (index < chars.length) {
-            char symbol = chars[index ++];
-            if (symbol == '\\' && index + 4 < chars.length) {
-                symbol = chars[index ++];
-
-                if (symbol == 'u') {
-                    String character = line.substring(index, index + 4);
-                    symbol = (char) Integer.parseInt(character, 16);
-                    index += 4;
-                }
-
-            }
-            builder.append(symbol);
-        }
-        return builder.toString();
-    }
-
 
 }
