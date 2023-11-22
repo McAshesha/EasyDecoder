@@ -27,9 +27,9 @@ EasyDecoder is a Java program designed for simple encoding and decoding of data 
 
 - `-encode`: Encode the data packet.
 - `-decode`: Decode the data packet.
-- `-lfm=<value>`: Set the Linear Feedback Mask (LFM) with the specified integer value.
-- `-in=<filename>`: Specify the input file name. Default is "input.json".
-- `-out=<filename>`: Specify the output file name. Default is "output.json".
+- `-lfm=<value>`: Set the Linear Feedback Mask (LFM) with the specified integer value. Default is random/read.
+- `-in=<filename>`: Specify the input file name or specify "console". Default is "console".
+- `-out=<filename>`: Specify the output file name or specify "console". Default is "console".
 
 ## Examples
 
@@ -42,7 +42,11 @@ EasyDecoder is a Java program designed for simple encoding and decoding of data 
 2. Decode a packet with a custom LFM:
 
    ```bash
-   java -jar EasyDecoder.jar -decode -lfm=123456
+   java -jar EasyDecoder.jar -lfm=154
+   ```
+   or with random/read LFM:
+   ```bash
+   java -jar EasyDecoder.jar -decode
    ```
 
 3. Encode a packet with custom input and output filenames:

@@ -13,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
         boolean encode = false;
-        String input = "input", output = "output";
+        String input = "console", output = "console";
         Decoder decoder = Decoder.getInstance();
 
         for (String arg : args) {
@@ -23,6 +23,12 @@ public class Main {
             else if (arg.equalsIgnoreCase("-decode"))
                 encode = false;
 
+            else if (arg.startsWith("-in="))
+                input = arg.substring(4);
+
+            else if (arg.startsWith("-out="))
+                output = arg.substring(5);
+
             else if (arg.startsWith("-lfm=")) {
                 try {
                     decoder.readLfm(Integer.parseInt(arg.substring(5)));
@@ -30,12 +36,7 @@ public class Main {
                     System.out.println("Invalid lfm format.");
                     exit(-1);
                 }
-
-            } else if (arg.startsWith("-in="))
-                input = arg.substring(4);
-
-            else if (arg.startsWith("-out="))
-                output = arg.substring(5);
+            }
         }
 
         try {
