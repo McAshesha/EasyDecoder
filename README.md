@@ -11,7 +11,7 @@ EasyDecoder is a Java program designed for simple encoding and decoding of data 
 
 ## Usage
 
-1. Download the `EasyDecoder.jar` file from [EasyDecoder.jar](https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1JIPxmLUs9sVrxRqLlEb0I3TDBPRjBqd0).
+1. Download the `EasyDecoder.jar` file from [EasyDecoder.jar](https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1fsoQxHXBaHb_eEHShrz5cwQs6XVdNjbF).
 
 2. Open a terminal or command prompt.
 
@@ -34,13 +34,11 @@ EasyDecoder is a Java program designed for simple encoding and decoding of data 
 ## Examples
 
 1. Encode a packet with default options:
-
    ```bash
    java -jar EasyDecoder.jar -encode
    ```
 
 2. Decode a packet with a custom LFM:
-
    ```bash
    java -jar EasyDecoder.jar -lfm=154
    ```
@@ -50,7 +48,6 @@ EasyDecoder is a Java program designed for simple encoding and decoding of data 
    ```
 
 3. Encode a packet with custom input and output filenames:
-
    ```bash
    java -jar EasyDecoder.jar -encode -in=my_input_data -out=my_output_data
    ```
