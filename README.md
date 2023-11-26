@@ -11,7 +11,7 @@ EasyDecoder is a Java program designed for simple encoding and decoding of data 
 
 ## Usage
 
-1. Download the [EasyDecoder.jar](https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1fsoQxHXBaHb_eEHShrz5cwQs6XVdNjbF).
+1. Download the EasyDecoder.jar from the [release page](https://github.com/McAshesha/EasyDecoder/releases).
 
 2. Open a terminal or command prompt.
 
