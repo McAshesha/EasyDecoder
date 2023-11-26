@@ -46,7 +46,7 @@ public class Main {
             else decoder.decodeArray(array);
 
             write(output, array.toString());
-            System.out.println("Read the packet from " + input + " and display the result in " + output + ".");
+            System.out.println("Read the packet from " + input + ".json and display the result in " + output + ".json.");
         } catch (Throwable ignored) {
             System.out.println("Invalid packet format in " + input + ".");
             exit(-1);
@@ -56,7 +56,7 @@ public class Main {
     static String read(String name) {
         if (name.equalsIgnoreCase("console")) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
-                return reader.readLine();
+                return toUTF8(reader.readLine());
             } catch (Throwable ignored) {
                 return "";
             }
@@ -67,7 +67,7 @@ public class Main {
     static void write(String name, String text) {
         if (name.equalsIgnoreCase("console")) {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8))) {
-                writer.write(text);
+                writer.write(toUTF8(text));
                 writer.flush();
             } catch (Throwable ignored) {
             }
